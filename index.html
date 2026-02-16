@@ -341,29 +341,47 @@
 
     /* ── CONTACT ── */
     .contact {
-      background: var(--cream);
+      position: relative;
+      background: var(--green-deep);
+      overflow: hidden;
+    }
+    .contact-bg {
+      position: absolute;
+      inset: 0;
+      z-index: 0;
+    }
+    .contact-bg img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      object-position: center top;
+      opacity: 0.18;
     }
     .contact-inner {
-      max-width: 1000px;
+      position: relative;
+      z-index: 1;
+      max-width: 580px;
       margin: 0 auto;
-      display: grid;
-      grid-template-columns: 1fr 420px;
-      gap: 56px;
-      align-items: start;
+      text-align: center;
     }
-    .contact-form-area {
-      background: var(--white);
-      border-radius: var(--radius-lg);
-      padding: 48px;
-      box-shadow: var(--shadow-md);
+    .contact-inner .section-label {
+      color: rgba(255, 255, 255, 0.7);
     }
-    .contact-form-area .section-title {
+    .contact-inner .section-title {
+      color: var(--white);
       margin-bottom: 8px;
     }
     .contact-note {
       font-size: 0.85rem;
-      color: var(--text-light);
-      margin-bottom: 32px;
+      color: rgba(255, 255, 255, 0.55);
+      margin-bottom: 36px;
+    }
+    .contact-form-card {
+      background: var(--white);
+      border-radius: var(--radius-lg);
+      padding: 44px 40px;
+      box-shadow: 0 12px 48px rgba(0, 0, 0, 0.2);
+      text-align: left;
     }
     .form-group {
       margin-bottom: 20px;
@@ -384,7 +402,7 @@
       font-family: inherit;
       font-size: 0.93rem;
       color: var(--text-dark);
-      background: var(--cream);
+      background: var(--green-faint);
       transition: border-color 0.2s, box-shadow 0.2s;
       outline: none;
     }
@@ -414,14 +432,6 @@
     .form-submit:hover {
       background: var(--green-deep);
       transform: translateY(-1px);
-    }
-    .contact-image {
-      position: sticky;
-      top: 120px;
-    }
-    .contact-image img {
-      border-radius: var(--radius-lg);
-      box-shadow: var(--shadow-lg);
     }
 
     /* ── FOOTER ── */
@@ -489,12 +499,9 @@
         margin-right: auto;
       }
       .contact-inner {
-        grid-template-columns: 1fr;
+        max-width: 580px;
       }
-      .contact-image {
-        display: none;
-      }
-      .contact-form-area {
+      .contact-form-card {
         padding: 32px 24px;
       }
     }
@@ -608,29 +615,38 @@
 
   <!-- CONTACT -->
   <section class="contact" id="contact">
+    <div class="contact-bg">
+      <img src="images/contact_woman.png" alt="" aria-hidden="true">
+    </div>
     <div class="contact-inner">
-      <div class="contact-form-area fade-up">
-        <p class="section-label">お問い合わせ</p>
-        <h2 class="section-title">まずはお気軽にご相談ください。</h2>
-        <p class="contact-note">※ ご相談後に必ず契約する必要はありません</p>
-        <div>
+      <p class="section-label fade-up">お問い合わせ</p>
+      <h2 class="section-title fade-up">まずはお気軽にご相談ください。</h2>
+      <p class="contact-note fade-up">※ ご相談後に必ず契約する必要はありません</p>
+      <div class="contact-form-card fade-up">
+        <form id="contactForm" action="https://api.web3forms.com/submit" method="POST">
+          <input type="hidden" name="access_key" value="da9b1dc5-a122-486f-84ee-4cb94bb58a45">
+          <input type="hidden" name="subject" value="ウェブサイトからのお問い合わせ">
+          <input type="hidden" name="from_name" value="matsuda-dx.com お問い合わせ">
+          <input type="checkbox" name="botcheck" style="display:none">
           <div class="form-group">
             <label for="name">お名前</label>
-            <input type="text" id="name" name="name" placeholder="例: 山田 太郎">
+            <input type="text" id="name" name="name" placeholder="例: 山田 太郎" required>
           </div>
           <div class="form-group">
             <label for="email">メールアドレス</label>
-            <input type="email" id="email" name="email" placeholder="例: info@example.com">
+            <input type="email" id="email" name="email" placeholder="例: info@example.com" required>
+          </div>
+          <div class="form-group">
+            <label for="company">会社名</label>
+            <input type="text" id="company" name="company" placeholder="例: 株式会社〇〇">
           </div>
           <div class="form-group">
             <label for="message">ご相談内容</label>
-            <textarea id="message" name="message" placeholder="お困りのことやご要望をお聞かせください"></textarea>
+            <textarea id="message" name="message" placeholder="お困りのことやご要望をお聞かせください" required></textarea>
           </div>
-          <button type="button" class="form-submit" id="submitBtn">送信</button>
-        </div>
-      </div>
-      <div class="contact-image fade-up">
-        <img src="images/contact_woman.png" alt="サポートスタッフ" width="420">
+          <button type="submit" class="form-submit">送信</button>
+        </form>
+        <p id="formResult" style="text-align:center;margin-top:16px;font-size:0.9rem;display:none;"></p>
       </div>
     </div>
   </section>
@@ -662,16 +678,37 @@
     document.querySelectorAll('.fade-up').forEach(el => observer.observe(el));
 
     // Simple form submission placeholder
-    document.getElementById('submitBtn').addEventListener('click', () => {
-      const name = document.getElementById('name').value.trim();
-      const email = document.getElementById('email').value.trim();
-      const message = document.getElementById('message').value.trim();
-      if (!name || !email || !message) {
-        alert('すべての項目をご入力ください。');
-        return;
+    // Form submission via Web3Forms
+    const form = document.getElementById('contactForm');
+    const result = document.getElementById('formResult');
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const btn = form.querySelector('.form-submit');
+      btn.textContent = '送信中...';
+      btn.disabled = true;
+      try {
+        const res = await fetch('https://api.web3forms.com/submit', {
+          method: 'POST',
+          body: new FormData(form)
+        });
+        const data = await res.json();
+        if (data.success) {
+          result.style.display = 'block';
+          result.style.color = '#3a7566';
+          result.textContent = 'お問い合わせありがとうございます。内容を確認の上、ご連絡いたします。';
+          form.reset();
+        } else {
+          result.style.display = 'block';
+          result.style.color = '#c0392b';
+          result.textContent = '送信に失敗しました。もう一度お試しください。';
+        }
+      } catch (err) {
+        result.style.display = 'block';
+        result.style.color = '#c0392b';
+        result.textContent = '送信に失敗しました。もう一度お試しください。';
       }
-      // TODO: Cloudflare Workers or email service integration
-      alert('お問い合わせありがとうございます。\n内容を確認の上、ご連絡いたします。');
+      btn.textContent = '送信';
+      btn.disabled = false;
     });
   </script>
 
